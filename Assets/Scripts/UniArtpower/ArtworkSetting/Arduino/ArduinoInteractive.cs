@@ -120,7 +120,7 @@ public class ArduinoInteractive : MonoBehaviour
 
 			if (arduinoPort.IsOpen) {
 				try {
-					string arduinoData = arduinoPort.ReadLine();
+					string arduinoData = ((char)arduinoPort.ReadByte()).ToString();
 					Debug.Log(" >> Read arduino data : " + arduinoData );
 					if(!string.IsNullOrEmpty(arduinoData)){
 						passToMainThread += () => {

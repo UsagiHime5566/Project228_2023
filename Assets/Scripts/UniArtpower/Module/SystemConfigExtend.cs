@@ -48,6 +48,15 @@ public static class SystemConfigExtend
         inp.text = val.ToString("0.00");
     }
 
+    public static void SetSavedDataString(this InputField inp, string savedString, string defValue, Action<string> changedToDo){
+        string val = SystemConfig.Instance.GetData<string>(savedString, defValue);
+        inp.onValueChanged.AddListener(x => {
+            SystemConfig.Instance.SaveData(savedString, x);
+            changedToDo?.Invoke(x);
+        });
+        inp.text = val;
+    }
+
     public static void SetSavedDataFloat(this Slider sld, string savedString, float defValue, Action<float> changedToDo){
         float val = SystemConfig.Instance.GetData<float>(savedString, defValue);
         sld.onValueChanged.AddListener(x => {

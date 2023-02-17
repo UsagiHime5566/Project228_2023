@@ -10,6 +10,10 @@ public class MainManager : MonoBehaviour
     public GameObject Lobby;
     public GameObject Choose;
     public InputField INP_IdleTime;
+    public InputField INT_H;
+    public InputField INT_L;
+    public InputField INT_R;
+    public InputField INT_E;
     public ArduinoInteractive arduinoInteractive;
 
     public List<Button> BTN_Books;
@@ -23,6 +27,11 @@ public class MainManager : MonoBehaviour
     public State currentStat = State.LOBBY;
 
     float ElapseIdle = 0;
+
+    [SerializeField] string signal_h;
+    [SerializeField] string signal_l;
+    [SerializeField] string signal_r;
+    [SerializeField] string signal_e;
 
     void Start()
     {
@@ -42,6 +51,19 @@ public class MainManager : MonoBehaviour
             idleBackTime = x;
         });
 
+        INT_H.SetSavedDataString("H", "h", s => {
+            signal_h = s;
+        });
+        INT_L.SetSavedDataString("L", "l", s => {
+            signal_l = s;
+        });
+        INT_R.SetSavedDataString("R", "r", s => {
+            signal_r = s;
+        });
+        INT_E.SetSavedDataString("E", "e", s => {
+            signal_e = s;
+        });
+
         arduinoInteractive.OnRecieveData += RecieveArduino;
 
         currentStat = State.LOBBY;
@@ -58,16 +80,16 @@ public class MainManager : MonoBehaviour
     }
 
     void RecieveArduino(string s){
-        if(s == "h"){
+        if(s == signal_h){
             Button_Home();
         }
-        if(s == "l"){
+        if(s == signal_l){
             Button_Left();
         }
-        if(s == "r"){
+        if(s == signal_r){
             Button_Right();
         }
-        if(s == "e"){
+        if(s == signal_e){
             Button_Enter();
         }
     }
