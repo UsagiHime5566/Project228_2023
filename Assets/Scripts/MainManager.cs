@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Threading.Tasks;
 
-public class MainManager : MonoBehaviour
+public class MainManager : HimeLib.SingletonMono<MainManager>
 {
     public GameObject Lobby;
     public GameObject Choose;
@@ -14,6 +14,8 @@ public class MainManager : MonoBehaviour
     public InputField INT_L;
     public InputField INT_R;
     public InputField INT_E;
+    public Toggle TG_MouseBlocker;
+    public GameObject OBJ_MouseBlocker;
     public ArduinoInteractive arduinoInteractive;
 
     public List<Button> BTN_Books;
@@ -21,6 +23,8 @@ public class MainManager : MonoBehaviour
 
     [Header("Config")]
     public float idleBackTime = 90f;
+    public float pageWaiting = 3;
+    public float pageNoAnimWaiting = 10;
 
     int focusBTN = 0;
 
@@ -60,8 +64,11 @@ public class MainManager : MonoBehaviour
         INT_R.SetSavedDataString("R", "r", s => {
             signal_r = s;
         });
-        INT_E.SetSavedDataString("E", "e", s => {
+        INT_E.SetSavedDataString("C", "c", s => {
             signal_e = s;
+        });
+        TG_MouseBlocker.onValueChanged.AddListener(x => {
+            OBJ_MouseBlocker.SetActive(x);
         });
 
         arduinoInteractive.OnRecieveData += RecieveArduino;
@@ -99,6 +106,7 @@ public class MainManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
 
         currentStat = State.CHOOSE;
+        ElapseIdle = 0;
     }
 
     void BackToLobby(){
@@ -134,12 +142,16 @@ public class MainManager : MonoBehaviour
     public void Button_Left(){
         if(!Choose.activeSelf) return;
 
+        ElapseIdle = 0;
+
         focusBTN = (focusBTN + BTN_Books.Count - 1) % BTN_Books.Count;
         EventSystem.current.SetSelectedGameObject(BTN_Books[focusBTN].gameObject);
     }
 
     public void Button_Right(){
         if(!Choose.activeSelf) return;
+
+        ElapseIdle = 0;
 
         focusBTN = (focusBTN + 1) % BTN_Books.Count;
         EventSystem.current.SetSelectedGameObject(BTN_Books[focusBTN].gameObject);
@@ -171,7 +183,7 @@ public class MainManager : MonoBehaviour
     void Update()
     {
         ElapseIdle += Time.deltaTime;
-        if(ElapseIdle > idleBackTime && currentStat != State.LOBBY){
+        if(ElapseIdle > idleBackTime && currentStat == State.CHOOSE){
             BackToLobby();
         }
 
